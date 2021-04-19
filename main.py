@@ -1,17 +1,30 @@
 import os
-import time
+import msvcrt
 import cursor
+import time
 
 from Juego import Juego
 
-juego = Juego();
 cursor.hide();
-
-
 os.system("cls");
 
-print("\033[%d;%dH" % (0, 0));
+juego = Juego();
 
-print(juego.obtener_pantalla());
+while True:
 
-time.sleep(1);
+    if msvcrt.kbhit():
+        tecla = msvcrt.getch();
+        
+        juego.player.update(tecla);
+
+        for enemigo in juego.enemigos:
+            enemigo.update();
+            enemigo.update_disparos();
+
+    juego.player.update_disparos(juego.enemigos);
+
+
+    print("\033[%d;%dH" % (0, 0));
+    print(juego.obtener_pantalla());
+
+    time.sleep(0.1);

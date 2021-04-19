@@ -1,4 +1,5 @@
-from GameObject import GameObject
+from Player import Player
+from Enemigo import Enemigo
 
 class Juego():
     def __init__(self, tamanno=(15, 40)):
@@ -6,7 +7,13 @@ class Juego():
         self.pantalla = [];
         self.generar_pantalla();
 
-        self.player = GameObject("O", 14, 20);
+        self.player = Player("O", 14, 20);
+
+        self.enemigos = [
+            Enemigo("V", 0, 6),
+            Enemigo("V", 0, 12),
+            Enemigo("V", 0, 24)
+        ];
 
     def generar_pantalla(self):
         for _ in range(0, self.tamanno[0]):
@@ -20,6 +27,14 @@ class Juego():
 
         self.pantalla[self.player.posicion.x][self.player.posicion.y] = self.player.caracter;
 
+        for enemigo in self.enemigos:
+            self.pantalla[enemigo.posicion.x][enemigo.posicion.y] = enemigo.caracter;
+            for disparo in enemigo.disparos:
+                self.pantalla[disparo.posicion.x][disparo.posicion.y] = disparo.caracter;
+
+        for disparo in self.player.disparos:
+            self.pantalla[disparo.posicion.x][disparo.posicion.y] = disparo.caracter;
+
     def limpiar_pantalla(self):
         for y in range(0, self.tamanno[0]):
             for x in range(0, self.tamanno[1]):
@@ -28,13 +43,10 @@ class Juego():
     def obtener_pantalla(self):
         self.relleno_pantalla();
 
-        print(self.player.posicion.x, self.player.posicion.y);
-        print(self.pantalla);
-
         contenido = "";
 
         contenido += "Juego de Naves hecho en Twitch\n";
-        contenido += "Puntos: 0\n\n";
+        contenido += f"Puntos: {self.player.puntos}\n\n";
         
         contenido += "-" * ((self.tamanno[1] * 2) + 2) + "\n";
 
