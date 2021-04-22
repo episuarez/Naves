@@ -2,6 +2,7 @@ import os
 import msvcrt
 import cursor
 import time
+import threading
 
 from Juego import Juego
 
@@ -10,21 +11,33 @@ os.system("cls");
 
 juego = Juego();
 
-while True:
-
-    if msvcrt.kbhit():
-        tecla = msvcrt.getch();
-        
-        juego.player.update(tecla);
-
+def gestion_enemigos():
+    while not juego.gameover:
         for enemigo in juego.enemigos:
             enemigo.update();
-            enemigo.update_disparos();
+            juego.gameover = enemigo.update_disparos(juego.player.posicion);
 
-    juego.player.update_disparos(juego.enemigos);
+        time.sleep(0.5);
 
+def gestion_disparos():
+    while not juego.gameover:
+        juego.player.update_disparos(juego.enemigos);
+
+        time.sleep(0.1);
+
+hilo_enemigos = threading.Thread(target=gestion_enemigos);
+hilo_disparos = threading.Thread(target=gestion_disparos);
+
+hilo_enemigos.start();
+hilo_disparos.start();
+
+while not juego.gameover:
+    if msvcrt.kbhit():
+        tecla = msvcrt.getch();
+        juego.player.update(tecla);
 
     print("\033[%d;%dH" % (0, 0));
     print(juego.obtener_pantalla());
 
-    time.sleep(0.1);
+os.system("cls");
+print(f"¡Has perdido! Con tantos puntos {juego.player.puntos}");
